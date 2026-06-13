@@ -11,16 +11,9 @@ module.exports = {
     // Integração roda via vscode-test, não via jest
     testPathIgnorePatterns: ['/node_modules/', '/tests/integracao/'],
 
-    // ts-jest com module CommonJS — necessário para Node.js
-    // verbatimModuleSyntax é desabilitado aqui: o tsconfig base exige import type
-    // por consistência, mas ts-jest opera em CommonJS onde isso não se aplica
     transform: {
         '^.+\\.ts$': ['ts-jest', {
-            tsconfig: {
-                module: 'commonjs',
-                verbatimModuleSyntax: false,
-                types: ['jest', 'node'],
-            },
+            tsconfig: './tsconfig.test.json',
         }],
     },
 
