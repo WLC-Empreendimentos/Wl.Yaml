@@ -1,4 +1,5 @@
-import { TamanhoIndentacaoInvalidoExcecao } from '../../../../src/nucleo/Excecoes/Perfil/TamanhoIndentacaoInvalidoExcecao';
+import { TamanhoIndentacaoInvalidoExcecao } from
+    '../../../../src/nucleo/Excecoes/Perfil/TamanhoIndentacaoInvalidoExcecao';
 import { ConfiguracaoInvalidaExcecao } from '../../../../src/nucleo/Excecoes/Base/ConfiguracaoInvalidaExcecao';
 import { YamlExtensaoExcecao } from '../../../../src/nucleo/Excecoes/Base/YamlExtensaoExcecao';
 
