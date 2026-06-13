@@ -6,7 +6,8 @@ describe('SchemaNaoEncontradoExcecaoTest', () => {
     test('Construtor_UriValida_FormataMensagemComUri', () => {
         const excecao = new SchemaNaoEncontradoExcecao('https://json.schemastore.org/github-workflow');
 
-        expect(excecao.message).toBe("Schema não encontrado para a URI 'https://json.schemastore.org/github-workflow'.");
+        const mensagemEsperada = "Schema não encontrado para a URI 'https://json.schemastore.org/github-workflow'.";
+        expect(excecao.message).toBe(mensagemEsperada);
     });
 
     test('Construtor_UriValida_DefineNameComoSchemaNaoEncontradoExcecao', () => {
