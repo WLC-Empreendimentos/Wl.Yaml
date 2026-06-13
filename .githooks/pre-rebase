@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# ============================================================================
+# Wl.Yaml — pre-rebase hook
+# ============================================================================
+# Bloqueia rebase em branches protegidas (main, develop).
+# ============================================================================
+
+set -uo pipefail
+
+RAIZ=$(git rev-parse --show-toplevel)
+cd "$RAIZ" || exit 1
+
+# shellcheck source=config.sh
+source "$RAIZ/.githooks/config.sh"
+
+BRANCH=${2:-$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")}
+
+echo ""
+echo -e "${VY_NEGRITO}====================================================${VY_RESET}"
+echo -e "${VY_NEGRITO} Wl.Yaml — Validação pré-rebase${VY_RESET}"
+echo -e "${VY_NEGRITO}====================================================${VY_RESET}"
+echo ""
+
+if vy_contem "$BRANCH" "${VY_BRANCHES_PROTEGIDAS[@]}"; then
+    vy_falha "Rebase em branch protegida '$BRANCH' não é permitido."
+    echo ""
+    echo -e "  ${VY_CINZA}O histórico de '$BRANCH' deve ser linear e imutável."
+    echo -e "  Para incorporar mudanças em sua branch de feature:"
+    echo -e ""
+    echo -e "    git fetch origin"
+    echo -e "    git rebase origin/develop   # na sua branch de feature${VY_RESET}"
+    echo ""
+    exit 1
+fi
+
+vy_ok "Branch '$BRANCH' — rebase permitido"
+exit 0

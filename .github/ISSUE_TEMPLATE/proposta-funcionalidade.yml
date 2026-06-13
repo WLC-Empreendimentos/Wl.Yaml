@@ -1,0 +1,60 @@
+name: Proposta de Funcionalidade
+description: Propor uma nova funcionalidade ou melhoria para a extensão
+title: "[FEAT] "
+labels: ["melhoria"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **Importante:** aguarde a aprovação na issue **antes** de implementar.
+        > PRs de funcionalidade sem issue aprovada prévia poderão ser fechados
+        > sem análise.
+
+  - type: checkboxes
+    id: verificacoes-previas
+    attributes:
+      label: Verificações prévias
+      options:
+        - label: >-
+            Pesquisei nas issues abertas e fechadas — não existe proposta
+            similar em andamento ou já descartada.
+          required: true
+
+  - type: textarea
+    id: problema
+    attributes:
+      label: Problema ou necessidade
+      description: >-
+        Qual problema esta funcionalidade resolve? Descreva com base em uma
+        situação concreta, não em preferência pessoal.
+      placeholder: >-
+        Ao trabalhar com arquivos YAML em X, não consigo Y porque Z.
+        Isso me obriga a fazer W manualmente toda vez que...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solucao-proposta
+    attributes:
+      label: Solução proposta
+      description: Como você imagina que a funcionalidade deveria funcionar?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas consideradas
+      description: Outras abordagens que você avaliou e por que as descartou.
+
+  - type: dropdown
+    id: ambiente
+    attributes:
+      label: Ambiente afetado
+      multiple: true
+      options:
+        - VS Code Desktop
+        - VS Code Web (vscode.dev)
+        - GitHub Codespaces
+    validations:
+      required: true

@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        // Ambiente WebWorker — sem node, sem DOM
+        "lib": ["ES2022", "WebWorker"],
+        "types": ["vscode"],
+
+        // Habilita saída para o webpack (ts-loader com transpileOnly)
+        "noEmit": false,
+        "sourceMap": true,
+        "outDir": "./out/browser"
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "dist", "out", "coverage", "_old", "src/extension.ts"]
+}

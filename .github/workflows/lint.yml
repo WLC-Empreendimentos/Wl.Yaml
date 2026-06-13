@@ -1,0 +1,22 @@
+# Análise estática com ESLint em todo o código-fonte TypeScript.
+# Chamado por: pr.yml
+
+name: Lint
+
+on:
+  workflow_call:
+
+permissions: read-all
+
+jobs:
+  lint:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Executar ESLint
+        run: npx eslint "src/**/*.ts"

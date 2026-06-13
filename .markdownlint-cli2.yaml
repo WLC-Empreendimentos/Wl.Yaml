@@ -1,0 +1,25 @@
+# Configuração do markdownlint-cli2 para a documentação do Wl.Identity.
+#
+# Regras desabilitadas (justificativa):
+# - MD013 (line-length): a documentação usa linhas longas em tabelas, URLs,
+#   blocos de citação e parágrafos contínuos por escolha de legibilidade.
+# - MD060 (table-column-style): tabelas com colunas variáveis e conteúdo longo
+#   tornam o alinhamento estrito de pipes inviável e cosmético.
+# - MD033 (no-inline-html): READMEs modernos usam <div align="center">,
+#   <details><summary> e <b> — elementos padrão do GitHub Markdown.
+# - MD036 (no-emphasis-as-heading): subtítulos centralizados com **negrito**
+#   sob o título principal são padrão visual em READMEs com badges.
+# - MD041 (first-line-h1): READMEs modernos abrem com <div align="center">
+#   antes do H1 para centralizar título, badges e tagline.
+config:
+  default: true
+  MD013: false
+  MD022: false
+  MD024: false
+  MD025: false
+  MD026: false
+  MD032: false
+  MD033: false
+  MD036: false
+  MD041: false
+  MD060: false

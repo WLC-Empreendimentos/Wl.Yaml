@@ -1,0 +1,27 @@
+# Testes de integração que requerem o VS Code (headless).
+# Chamado por: pr.yml, noturno.yml
+
+name: Integração
+
+on:
+  workflow_call:
+
+permissions: read-all
+
+jobs:
+  integracao:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Compilar extensão
+        run: npm run compile
+
+      - name: Executar testes de integração
+        run: npx vscode-test
+        env:
+          DISPLAY: ':99'

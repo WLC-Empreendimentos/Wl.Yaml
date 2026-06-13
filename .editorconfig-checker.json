@@ -1,0 +1,12 @@
+{
+    "Exclude": [
+        "\\.git/",
+        "node_modules/",
+        "dist/",
+        "out/",
+        "coverage/",
+        "_old/",
+        "\\.vsix$",
+        "\\.md$"
+    ]
+}

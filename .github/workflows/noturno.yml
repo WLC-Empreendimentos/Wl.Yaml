@@ -1,0 +1,88 @@
+# Pipeline noturna — roda às 03:00 UTC em develop.
+#
+# Jobs:
+#   - jest-completo    : suite completa sem cache
+#   - integracao       : VS Code estável + VS Code insiders
+#   - auditoria-deps   : npm audit
+#
+# Também pode ser disparado manualmente via workflow_dispatch.
+# Consulte: docs/padronizacao/qualidade/CICD.md
+
+name: Noturno
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions: read-all
+
+jobs:
+  # --------------------------------------------------------------------------
+  # Preflight
+  # --------------------------------------------------------------------------
+  preflight:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 5
+    outputs:
+      tem_codigo:    ${{ steps.check.outputs.tem_codigo }}
+      tem_testes:    ${{ steps.check.outputs.tem_testes }}
+      tem_integracao: ${{ steps.check.outputs.tem_integracao }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: check
+        run: |
+          set -euo pipefail
+
+          if [ -f "package.json" ] && \
+            [ -n "$(find src -maxdepth 5 -name '*.ts' 2>/dev/null | head -1)" ]; then
+            echo "tem_codigo=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "tem_codigo=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -d "tests" ] && \
+            [ -n "$(find tests -maxdepth 5 -name '*.test.ts' 2>/dev/null | head -1)" ]; then
+            echo "tem_testes=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "tem_testes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -d "tests/integracao" ] && \
+            [ -n "$(find tests/integracao -maxdepth 5 -name '*.ts' 2>/dev/null | head -1)" ]; then
+            echo "tem_integracao=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "tem_integracao=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # --------------------------------------------------------------------------
+  # Jobs
+  # --------------------------------------------------------------------------
+  jest-completo:
+    needs: preflight
+    if: needs.preflight.outputs.tem_testes == 'true'
+    uses: ./.github/workflows/jest.yml
+
+  integracao:
+    needs: [preflight, jest-completo]
+    if: needs.preflight.outputs.tem_integracao == 'true'
+    uses: ./.github/workflows/integracao.yml
+
+  auditoria-deps:
+    needs: preflight
+    if: needs.preflight.outputs.tem_codigo == 'true'
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Auditar dependências
+        run: npm audit --audit-level=high

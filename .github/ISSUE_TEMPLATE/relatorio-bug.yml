@@ -1,0 +1,110 @@
+name: Relatório de Bug
+description: Reportar um comportamento incorreto ou falha na extensão
+title: "[BUG] "
+labels: ["defeito"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar! Preencha todos os campos obrigatórios para que o
+        problema possa ser reproduzido e corrigido.
+
+        > **Atenção:** para vulnerabilidades de segurança, **não use este
+        > formulário** — siga o processo em [SECURITY.md](../../SECURITY.md).
+
+  - type: checkboxes
+    id: verificacoes-previas
+    attributes:
+      label: Verificações prévias
+      options:
+        - label: >-
+            Pesquisei nas issues abertas e fechadas antes de criar esta —
+            o problema não está documentado nem resolvido.
+          required: true
+        - label: >-
+            Este não é um problema de segurança (para segurança, uso o canal
+            privado descrito em SECURITY.md).
+          required: true
+
+  - type: input
+    id: versao-extensao
+    attributes:
+      label: Versão da extensão
+      description: Disponível em Extensions → Wl.Yaml → detalhes.
+      placeholder: "1.2.3"
+    validations:
+      required: true
+
+  - type: input
+    id: versao-vscode
+    attributes:
+      label: Versão do VS Code
+      description: Disponível em Help → About.
+      placeholder: "1.90.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: sistema-operacional
+    attributes:
+      label: Sistema operacional
+      options:
+        - Linux x86_64
+        - Windows 10 x86_64
+        - Windows 11 x86_64
+        - macOS
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ambiente
+    attributes:
+      label: Ambiente
+      options:
+        - VS Code Desktop
+        - VS Code Web (vscode.dev)
+        - GitHub Codespaces
+    validations:
+      required: true
+
+  - type: textarea
+    id: passos
+    attributes:
+      label: Passos para reproduzir
+      description: Sequência mínima e precisa de ações que reproduz o problema.
+      placeholder: |
+        1. Abrir arquivo X
+        2. Executar a ação Y
+        3. Observar o comportamento Z
+    validations:
+      required: true
+
+  - type: textarea
+    id: comportamento-esperado
+    attributes:
+      label: Comportamento esperado
+      description: O que deveria acontecer?
+    validations:
+      required: true
+
+  - type: textarea
+    id: comportamento-observado
+    attributes:
+      label: Comportamento observado
+      description: O que aconteceu de fato?
+    validations:
+      required: true
+
+  - type: textarea
+    id: yaml-profile
+    attributes:
+      label: Conteúdo do .yaml-profile.json (se aplicável)
+      description: Cole o conteúdo do arquivo de perfil do projeto, se existir.
+      render: json
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / saída de erro
+      description: Cole o texto do Output → Wl.Yaml — não anexe imagens de texto.
+      render: text

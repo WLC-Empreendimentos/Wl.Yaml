@@ -1,0 +1,29 @@
+# Testes unitários com Jest e coleta de cobertura.
+# Chamado por: pr.yml, noturno.yml
+
+name: Jest
+
+on:
+  workflow_call:
+
+permissions: read-all
+
+jobs:
+  jest:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Executar testes
+        run: npx jest --coverage --ci
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 30

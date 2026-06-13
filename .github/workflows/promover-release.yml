@@ -1,0 +1,100 @@
+# Promoção automática develop → main ao criar uma tag de release.
+#
+# Fluxo:
+#   1. Tag v*.*.* criada em develop
+#   2. Valida que a tag aponta exatamente para o HEAD de develop
+#   3. Valida que a versão da tag bate com "version" em package.json
+#   4. Verifica que todos os check-runs do commit estão success/skipped
+#   5. Squash-merge develop → main
+#
+# Pré-requisito: todos os jobs do pr.yml devem ter passado no commit tagueado.
+# Consulte: docs/padronizacao/qualidade/CICD.md
+
+name: Promover Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*.[0-9]*.[0-9]*'
+
+permissions: read-all
+
+jobs:
+  promover:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+          token: ${{ env.PAT_TOKEN }}
+
+      - name: Configurar identidade git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Validar que a tag aponta para HEAD de develop
+        run: |
+          TAG="${{ github.ref_name }}"
+          TAG_SHA=$(git rev-list -n 1 "refs/tags/${TAG}")
+          DEVELOP_SHA=$(git rev-parse HEAD)
+          if [ "${TAG_SHA}" != "${DEVELOP_SHA}" ]; then
+            echo "::error::A tag ${TAG} (${TAG_SHA}) não aponta para o HEAD de develop (${DEVELOP_SHA})."
+            exit 1
+          fi
+          echo "TAG_SHA=${TAG_SHA}" >> "$GITHUB_ENV"
+
+      - name: Validar versão da tag vs package.json
+        run: |
+          TAG="${{ github.ref_name }}"
+          TAG_VER="${TAG#v}"
+          PKG_VER=$(node -p "require('./package.json').version")
+          echo "Tag: ${TAG_VER}  |  package.json: ${PKG_VER}"
+          if [ "${TAG_VER}" != "${PKG_VER}" ]; then
+            echo "::error::Versão da tag (${TAG_VER}) ≠ version em package.json (${PKG_VER})."
+            exit 1
+          fi
+
+      - name: Verificar todos os checks do commit
+        run: |
+          set -euo pipefail
+          SHA="${TAG_SHA}"
+          REPO="${{ github.repository }}"
+
+          for i in $(seq 1 30); do
+            PENDING=$(gh api "repos/${REPO}/commits/${SHA}/check-runs" \
+              --paginate \
+              --jq '[.check_runs[] | select(.name != "Promover Release") |
+                    select(.status != "completed")] | length')
+            if [ "${PENDING}" -eq 0 ]; then break; fi
+            echo "Aguardando ${PENDING} check(s) pendente(s)... (${i}/30)"
+            sleep 10
+          done
+
+          FALHOS=$(gh api "repos/${REPO}/commits/${SHA}/check-runs" \
+            --paginate \
+            --jq '[.check_runs[] | select(.name != "Promover Release") |
+                  select(.conclusion != "success" and .conclusion != "skipped")] |
+                  map(.name + " → " + .conclusion) | .[]')
+          if [ -n "${FALHOS}" ]; then
+            echo "::error::Checks com falha ou não concluídos:"
+            echo "${FALHOS}"
+            exit 1
+          fi
+          echo "Todos os checks passaram."
+        env:
+          GH_TOKEN: ${{ env.PAT_TOKEN }}
+
+      - name: Squash-merge develop → main
+        run: |
+          TAG="${{ github.ref_name }}"
+          git fetch origin main
+          git checkout main
+          git merge --squash origin/develop
+          git commit -m "release: ${TAG}"
+          git push origin main

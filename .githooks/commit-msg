@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# ============================================================================
+# Wl.Yaml — commit-msg (orquestrador)
+# ============================================================================
+# Valida que a mensagem segue Conventional Commits 1.0.0 em português.
+# Referência: docs/padronizacao/runtime/COMMITS.md
+#
+# Bypass: git commit --no-verify
+# ============================================================================
+
+set -uo pipefail
+
+# shellcheck disable=SC2034  # lido por lib/mensagem.sh via vy_parse_mensagem
+ARQUIVO_MSG=$1
+RAIZ=$(git rev-parse --show-toplevel)
+
+# shellcheck source=config.sh
+source "$RAIZ/.githooks/config.sh"
+# shellcheck source=lib/mensagem.sh
+source "$RAIZ/.githooks/lib/mensagem.sh"
+
+vy_parse_mensagem
+
+# Permitir merge / revert automáticos
+if [[ "$TITULO" =~ ^(Merge|Revert)\  ]] || [[ "$TITULO" =~ ^Revert\ \" ]]; then
+    exit 0
+fi
+
+erros=()
+warns=()
+
+for arquivo in "$RAIZ"/.githooks/verificacoes/mensagem/*.sh; do
+    unset VY_TITULO
+    unset -f vy_verificar 2>/dev/null || true
+    # shellcheck source=/dev/null
+    source "$arquivo"
+    vy_verificar
+done
+
+# ----------------------------------------------------------------------------
+# Resultado
+# ----------------------------------------------------------------------------
+if (( ${#erros[@]} == 0 )); then
+    echo -e "${VY_VERDE}Mensagem de commit válida${VY_RESET}"
+    if (( ${#warns[@]} > 0 )); then
+        echo ""
+        for w in "${warns[@]}"; do
+            echo -e "  ${VY_AMARELO}AVISO${VY_RESET} $w"
+        done
+    fi
+    exit 0
+fi
+
+echo ""
+echo -e "${VY_VERMELHO}${VY_NEGRITO}===================================================="
+echo "  Mensagem de commit INVÁLIDA"
+echo -e "====================================================${VY_RESET}"
+echo ""
+echo -e "${VY_NEGRITO}Mensagem recebida:${VY_RESET}"
+echo "  $TITULO"
+echo ""
+echo -e "${VY_NEGRITO}Problemas:${VY_RESET}"
+for e in "${erros[@]}"; do
+    echo -e "  ${VY_VERMELHO}*${VY_RESET} $e"
+done
+
+if (( ${#warns[@]} > 0 )); then
+    echo ""
+    echo -e "${VY_NEGRITO}Avisos:${VY_RESET}"
+    for w in "${warns[@]}"; do
+        echo -e "  ${VY_AMARELO}*${VY_RESET} $w"
+    done
+fi
+
+echo ""
+echo -e "${VY_NEGRITO}Formato esperado:${VY_RESET}"
+echo "  tipo(escopo)?!?: descrição curta em português, infinitivo, minúsculo"
+echo ""
+echo "  <linha em branco>"
+echo "  Corpo opcional explicando o porquê (sem limite rígido)."
+echo ""
+echo "  <linha em branco>"
+echo "  BREAKING CHANGE: descrição  (apenas se '!' no título)"
+echo "  Refs: #123"
+echo ""
+echo -e "${VY_NEGRITO}Tipos:${VY_RESET}    ${VY_TIPOS_VALIDOS[*]}"
+echo -e "${VY_NEGRITO}Escopos:${VY_RESET}  $(IFS=', '; echo "${VY_ESCOPOS_VALIDOS[*]}")"
+echo ""
+echo -e "${VY_NEGRITO}Exemplos:${VY_RESET}"
+echo -e "  ${VY_VERDE}feat(perfil): adicionar suporte a glob patterns no .yaml-profile.json${VY_RESET}"
+echo -e "  ${VY_VERDE}fix(lsp): corrigir diagnóstico duplicado em arquivos grandes${VY_RESET}"
+echo -e "  ${VY_VERDE}docs: atualizar diagrama de camadas da CA${VY_RESET}"
+echo -e "  ${VY_VERDE}feat(servidor)!: substituir yaml-language-server por implementação própria${VY_RESET}"
+echo ""
+echo -e "${VY_AMARELO}Bypass (NÃO recomendado):${VY_RESET} git commit --no-verify"
+echo ""
+echo "Detalhes: docs/padronizacao/runtime/COMMITS.md"
+exit 1

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# ============================================================================
+# Wl.Yaml — pre-push (orquestrador)
+# ============================================================================
+# Executa as verificações em .githooks/verificacoes/push/NN-*.sh.
+#
+# Bypass: git push --no-verify
+# ============================================================================
+
+set -uo pipefail
+
+RAIZ=$(git rev-parse --show-toplevel)
+cd "$RAIZ" || exit 1
+
+# shellcheck source=config.sh
+source "$RAIZ/.githooks/config.sh"
+# shellcheck source=lib/runner.sh
+source "$RAIZ/.githooks/lib/runner.sh"
+# shellcheck source=lib/git.sh
+source "$RAIZ/.githooks/lib/git.sh"
+
+vy_iniciar "Validação pré-push"
+
+REMOTE=$1
+# URL=$2  # disponível mas não usado
+
+LINHAS=$(cat)
+
+export RAIZ REMOTE LINHAS
+
+vy_executar_verificacoes "$RAIZ/.githooks/verificacoes/push"
+vy_finalizar "Pré-push" "git push --no-verify"

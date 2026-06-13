@@ -1,0 +1,19 @@
+# Validação de Markdown com markdownlint-cli2.
+# Chamado por: pr.yml
+
+name: Markdown
+
+on:
+  workflow_call:
+
+permissions: read-all
+
+jobs:
+  markdown:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar markdown
+        run: markdownlint-cli2 "**/*.md"

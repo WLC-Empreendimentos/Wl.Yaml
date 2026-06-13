@@ -1,0 +1,101 @@
+# Pipeline de release — disparado por tag v*.
+#
+# Jobs:
+#   - empacotar           : npm ci + vsce package
+#   - publicar-marketplace: vsce publish → VS Code Marketplace
+#   - publicar-openvsx    : ovsx publish → Open VSX Registry
+#
+# Pré-requisito: o commit da tag deve ter passado pelo pr.yml.
+# Consulte: docs/padronizacao/qualidade/CICD.md
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions: read-all
+
+jobs:
+  # --------------------------------------------------------------------------
+  # Preflight
+  # --------------------------------------------------------------------------
+  preflight:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 5
+    outputs:
+      tem_codigo: ${{ steps.check.outputs.tem_codigo }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: check
+        run: |
+          if [ -f "package.json" ] && \
+            [ -n "$(find src -maxdepth 5 -name '*.ts' 2>/dev/null | head -1)" ]; then
+            echo "tem_codigo=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "Sem código TypeScript — jobs de empacotamento serão ignorados."
+            echo "tem_codigo=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # --------------------------------------------------------------------------
+  # Empacotamento
+  # --------------------------------------------------------------------------
+  empacotar:
+    needs: preflight
+    if: needs.preflight.outputs.tem_codigo == 'true'
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Empacotar extensão
+        run: npx vsce package --no-dependencies
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: "*.vsix"
+          retention-days: 90
+
+  # --------------------------------------------------------------------------
+  # Publicação — VS Code Marketplace
+  # --------------------------------------------------------------------------
+  publicar-marketplace:
+    needs: [preflight, empacotar]
+    if: needs.preflight.outputs.tem_codigo == 'true'
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vsix
+
+      - name: Publicar no VS Code Marketplace
+        run: npx vsce publish --packagePath ./*.vsix
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+  # --------------------------------------------------------------------------
+  # Publicação — Open VSX Registry
+  # --------------------------------------------------------------------------
+  publicar-openvsx:
+    needs: [preflight, empacotar]
+    if: needs.preflight.outputs.tem_codigo == 'true'
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vsix
+
+      - name: Publicar no Open VSX
+        run: npx ovsx publish ./*.vsix
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}

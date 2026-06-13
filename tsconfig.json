@@ -1,0 +1,39 @@
+{
+    "compilerOptions": {
+        // Alvo e módulos
+        "target": "ES2022",
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "lib": ["ES2022"],
+
+        // Rigor de tipos
+        "strict": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "exactOptionalPropertyTypes": true,
+        "noUncheckedIndexedAccess": true,
+
+        // Importações
+        "verbatimModuleSyntax": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+
+        // Saída — desabilitada aqui; este tsconfig serve apenas para typecheck
+        "noEmit": true,
+        "sourceMap": false,
+        "rootDir": "./src",
+
+        // Tipos globais — sobrescritos nos configs de build
+        "skipLibCheck": true,
+        "types": ["node", "vscode"]
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "dist", "out", "coverage", "_old"]
+}

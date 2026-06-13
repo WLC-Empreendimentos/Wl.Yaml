@@ -1,0 +1,35 @@
+# CODEOWNERS — vscode-yaml
+#
+# Todo PR exige aprovação de @cavalcante-willian.
+# A regra global (*) cobre todos os arquivos do repositório;
+# as regras específicas abaixo são redundantes por segurança —
+# se a regra global for removida acidentalmente, os caminhos
+# críticos continuam protegidos.
+#
+# Referência: docs/padronizacao/qualidade/CICD.md
+#
+# IMPORTANTE: para que CODEOWNERS tenha efeito, branch protection
+# deve ter "Require review from Code Owners" ativado em:
+# Settings → Branches → main → Require a pull request before merging.
+
+# ── Regra global ─────────────────────────────────────────────────────
+* @cavalcante-willian
+
+# ── Caminhos críticos (proteção explícita adicional) ─────────────────
+# Workflows — impede troca silenciosa de secrets ou runners
+.github/workflows/**          @cavalcante-willian
+.github/CODEOWNERS            @cavalcante-willian
+
+# Padronização — decisões de arquitetura e CI/CD
+docs/padronizacao/**          @cavalcante-willian
+
+# Toolchain e qualidade
+.editorconfig                 @cavalcante-willian
+.editorconfig-checker.json    @cavalcante-willian
+tsconfig*.json                @cavalcante-willian
+webpack.config.*              @cavalcante-willian
+package.json                  @cavalcante-willian
+
+# Licença e segurança
+LICENSE                       @cavalcante-willian
+SECURITY.md                   @cavalcante-willian

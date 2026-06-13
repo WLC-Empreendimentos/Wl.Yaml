@@ -1,0 +1,20 @@
+# Validação EditorConfig — garante codificação, final de linha e indentação.
+# Markdown excluído: markdownlint é a autoridade (configurado em .editorconfig-checker.json).
+# Chamado por: pr.yml
+
+name: EditorConfig
+
+on:
+  workflow_call:
+
+permissions: read-all
+
+jobs:
+  editorconfig:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar editorconfig
+        run: editorconfig-checker

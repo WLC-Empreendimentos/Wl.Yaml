@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# ============================================================================
+# Wl.Yaml — pre-commit (orquestrador)
+# ============================================================================
+# Executa em ordem todas as verificações em:
+#     .githooks/verificacoes/commit/NN-*.sh
+#
+# Cada arquivo define VY_TITULO e a função vy_verificar.
+# Para desligar uma etapa: renomeie para NN-nome.sh.skip
+#
+# Bypass: git commit --no-verify
+# ============================================================================
+
+set -uo pipefail
+
+RAIZ=$(git rev-parse --show-toplevel)
+cd "$RAIZ" || exit 1
+
+# shellcheck source=config.sh
+source "$RAIZ/.githooks/config.sh"
+# shellcheck source=lib/runner.sh
+source "$RAIZ/.githooks/lib/runner.sh"
+# shellcheck source=lib/cache.sh
+source "$RAIZ/.githooks/lib/cache.sh"
+# shellcheck source=lib/git.sh
+source "$RAIZ/.githooks/lib/git.sh"
+
+vy_iniciar "Validação pré-commit"
+[[ "${VY_HOOK_FAST:-0}" == "1" ]] \
+    && echo -e "${VY_AMARELO}Modo FAST ativo${VY_RESET} (etapas pesadas puladas)"
+
+STAGED=$(vy_staged)
+
+if [[ -z "$STAGED" ]]; then
+    echo ""
+    aviso "Nenhum arquivo staged. Nada a validar."
+    exit 0
+fi
+export STAGED RAIZ
+
+vy_executar_verificacoes "$RAIZ/.githooks/verificacoes/commit"
+vy_finalizar "Pré-commit" "git commit --no-verify"

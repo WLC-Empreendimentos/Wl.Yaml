@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# ============================================================================
+# Wl.Yaml — prepare-commit-msg hook
+# ============================================================================
+# Pré-preenche a mensagem de commit a partir do nome da branch.
+#
+# Convenções suportadas:
+#   feat/perfil/adicionar-glob          -> "feat(perfil): "
+#   fix/lsp-diagnostico                 -> "fix: "
+#   docs/atualizar-camadas              -> "docs: "
+#
+# Só executa quando a mensagem está vazia.
+# ============================================================================
+
+set -uo pipefail
+
+ARQUIVO_MSG=$1
+TIPO_COMMIT=${2:-}
+
+case "$TIPO_COMMIT" in
+    message|template|merge|squash|commit) exit 0 ;;
+esac
+
+RAIZ=$(git rev-parse --show-toplevel)
+
+# shellcheck source=config.sh
+source "$RAIZ/.githooks/config.sh"
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+
+case "$BRANCH" in
+    HEAD|main|develop|"") exit 0 ;;
+esac
+
+CONTEUDO=$(grep -v '^#' "$ARQUIVO_MSG" 2>/dev/null | sed '/^[[:space:]]*$/d' || true)
+[[ -n "$CONTEUDO" ]] && exit 0
+
+# ----------------------------------------------------------------------------
+# Extrair tipo, escopo e ticket da branch
+# ----------------------------------------------------------------------------
+TIPO=""
+ESCOPO=""
+TICKET=""
+
+if [[ "$BRANCH" =~ ^([a-z]+)/(.+)$ ]]; then
+    POSSIVEL_TIPO="${BASH_REMATCH[1]}"
+    RESTO="${BASH_REMATCH[2]}"
+    if vy_contem "$POSSIVEL_TIPO" "${VY_TIPOS_VALIDOS[@]}"; then
+        TIPO="$POSSIVEL_TIPO"
+        if [[ "$RESTO" =~ ^([a-z0-9-]+)/(.+)$ ]]; then
+            POSSIVEL_ESCOPO="${BASH_REMATCH[1]}"
+            if vy_contem "$POSSIVEL_ESCOPO" "${VY_ESCOPOS_VALIDOS[@]}"; then
+                ESCOPO="$POSSIVEL_ESCOPO"
+            fi
+        elif [[ "$RESTO" =~ ^([a-z0-9-]+)-(.+)$ ]]; then
+            POSSIVEL_ESCOPO="${BASH_REMATCH[1]}"
+            if vy_contem "$POSSIVEL_ESCOPO" "${VY_ESCOPOS_VALIDOS[@]}"; then
+                ESCOPO="$POSSIVEL_ESCOPO"
+            fi
+        fi
+    fi
+fi
+
+if [[ "$BRANCH" =~ ([A-Z]{2,}-[0-9]+) ]]; then
+    TICKET="${BASH_REMATCH[1]}"
+fi
+
+# ----------------------------------------------------------------------------
+# Montar prefixo
+# ----------------------------------------------------------------------------
+PREFIXO=""
+if [[ -n "$TIPO" ]]; then
+    if [[ -n "$ESCOPO" ]]; then
+        PREFIXO="${TIPO}(${ESCOPO}): "
+    else
+        PREFIXO="${TIPO}: "
+    fi
+fi
+
+[[ -z "$PREFIXO" && -z "$TICKET" ]] && exit 0
+
+# ----------------------------------------------------------------------------
+# Escrever mensagem inicial
+# ----------------------------------------------------------------------------
+ORIGINAL=$(cat "$ARQUIVO_MSG" 2>/dev/null || true)
+
+{
+    echo -n "$PREFIXO"
+    echo ""
+    echo ""
+    echo "# Branch: $BRANCH"
+    echo "# Tipo:   ${TIPO:-(definir)}     Escopo: ${ESCOPO:-(opcional)}"
+    [[ -n "$TICKET" ]] && echo "# Ticket: $TICKET (será adicionado em Refs:)"
+    echo "#"
+    echo "# Checklist:"
+    echo "#   [ ] descrição no infinitivo, minúscula, sem ponto final"
+    echo "#   [ ] título <= ${VY_COMMIT_TITULO_MAX} caracteres"
+    echo "#   [ ] corpo explica POR QUE (não o que)"
+    echo "#   [ ] BREAKING CHANGE no rodapé se quebrar API pública"
+    echo "#"
+    if [[ -n "$TICKET" ]]; then
+        echo ""
+        echo "Refs: #$TICKET"
+    fi
+    echo ""
+    echo "$ORIGINAL" | sed -n '/^# Please enter the commit message/,$p'
+} >"$ARQUIVO_MSG.tmp"
+
+mv "$ARQUIVO_MSG.tmp" "$ARQUIVO_MSG"
+exit 0

@@ -1,0 +1,85 @@
+{
+    "name": "wl-yaml",
+    "displayName": "Wl.Yaml",
+    "description": "Suporte YAML com perfis de formatação por projeto via .yaml-profile.json",
+    "version": "0.1.0",
+    "publisher": "cavalcante-willian",
+    "license": "MIT",
+    "engines": {
+        "vscode": "^1.95.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Formatters",
+        "Linters"
+    ],
+    "keywords": [
+        "yaml",
+        "yml",
+        "format",
+        "schema",
+        "lint"
+    ],
+    "activationEvents": [
+        "onLanguage:yaml"
+    ],
+    "main": "./dist/extension.js",
+    "browser": "./dist/extensionBrowser.js",
+    "contributes": {
+        "languages": [
+            {
+                "id": "yaml",
+                "aliases": ["YAML", "yaml"],
+                "extensions": [".yml", ".yaml"],
+                "mimetypes": ["application/x-yaml", "text/x-yaml"]
+            }
+        ],
+        "configuration": {
+            "title": "YAML",
+            "properties": {
+                "yaml.perfilGlobal": {
+                    "type": "string",
+                    "default": "",
+                    "markdownDescription": "Caminho do `.yaml-profile.json` global (fallback)."
+                },
+                "yaml.trace.servidor": {
+                    "type": "string",
+                    "enum": ["off", "messages", "verbose"],
+                    "default": "off",
+                    "description": "Nível de rastreamento da comunicação com o servidor de linguagem."
+                }
+            }
+        }
+    },
+    "scripts": {
+        "compilar": "webpack --mode production",
+        "compilar:dev": "webpack --mode development",
+        "observar": "webpack --mode development --watch",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint \"src/**/*.ts\"",
+        "test": "jest --coverage",
+        "test:integracao": "xvfb-run --auto-servernum npx vscode-test",
+        "empacotar": "vsce package --no-dependencies"
+    },
+    "dependencies": {
+        "vscode-languageclient": "^9.0.1",
+        "yaml-language-server": "1.15.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.5.14",
+        "@types/node": "^22.0.0",
+        "@types/vscode": "^1.95.0",
+        "typescript-eslint": "^8.0.0",
+        "@vscode/test-cli": "^0.0.10",
+        "@vscode/test-electron": "^2.4.1",
+        "@vscode/vsce": "^3.0.0",
+        "eslint": "^9.0.0",
+        "jest": "^29.7.0",
+        "ovsx": "^0.9.0",
+        "ts-jest": "^29.2.0",
+        "ts-loader": "^9.5.0",
+        "typescript": "6.0.3",
+        "webpack": "^5.99.0",
+        "webpack-cli": "^5.1.0"
+    }
+}
