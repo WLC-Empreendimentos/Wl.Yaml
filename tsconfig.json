@@ -35,5 +35,5 @@
         "types": ["node", "vscode"]
     },
     "include": ["src/**/*.ts"],
-    "exclude": ["node_modules", "dist", "out", "coverage", "_old"]
+    "exclude": ["node_modules", "dist", "out", "coverage", "_old", "tests"]
 }
