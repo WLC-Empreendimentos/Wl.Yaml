@@ -19,6 +19,7 @@ module.exports = {
             tsconfig: {
                 module: 'commonjs',
                 verbatimModuleSyntax: false,
+                types: ['jest', 'node'],
             },
         }],
     },
