@@ -1,5 +1,5 @@
 import type { CancellationToken } from 'vscode';
-import type { IRepositorioConfiguracoes } from '../../../src/nucleo/Interfaces/Repositorios/IRepositorioConfiguracoes';
+import type { IRepositorioPerfilPadrao } from '../../../src/nucleo/Interfaces/Repositorios/IRepositorioPerfilPadrao';
 import type {
     ServicoCorrespondenciaPerfilProjeto,
 } from '../../../src/aplicacao/Servicos/ServicoCorrespondenciaPerfilProjeto';
@@ -25,21 +25,21 @@ function criarPerfil(indentacao = 2): PerfilFormatacao {
 
 describe('ServicoResolucaoFormatacaoTest', () => {
     let obterPerfilCorrespondente: jest.Mock<Promise<PerfilFormatacao | undefined>, []>;
-    let obterPerfilAsync: jest.Mock;
+    let obterAsync: jest.Mock<Promise<PerfilFormatacao | undefined>, []>;
     let correspondencia: ServicoCorrespondenciaPerfilProjeto;
-    let repositorioConfiguracoes: IRepositorioConfiguracoes;
+    let repositorioPerfilPadrao: IRepositorioPerfilPadrao;
 
     beforeEach(() => {
         obterPerfilCorrespondente = jest.fn<Promise<PerfilFormatacao | undefined>, []>();
-        obterPerfilAsync = jest.fn();
+        obterAsync = jest.fn<Promise<PerfilFormatacao | undefined>, []>();
         correspondencia = {
             ObterPerfilCorrespondenteAsync: obterPerfilCorrespondente,
         } as unknown as ServicoCorrespondenciaPerfilProjeto;
-        repositorioConfiguracoes = { FormatacaoHabilitada: jest.fn(), ObterPerfilAsync: obterPerfilAsync };
+        repositorioPerfilPadrao = { ObterAsync: obterAsync };
     });
 
     function criarServico(): ServicoResolucaoFormatacao {
-        return new ServicoResolucaoFormatacao(correspondencia, repositorioConfiguracoes);
+        return new ServicoResolucaoFormatacao(correspondencia, repositorioPerfilPadrao);
     }
 
     it('ResolverPerfilEfetivo_CorrespondenciaEncontrada_RetornaPerfilDoProjeto', async () => {
@@ -52,7 +52,7 @@ describe('ServicoResolucaoFormatacaoTest', () => {
 
     it('ResolverPerfilEfetivo_SemCorrespondencia_RetornaPerfilDasConfiguracoes', async () => {
         obterPerfilCorrespondente.mockResolvedValue(undefined);
-        obterPerfilAsync.mockResolvedValue(criarPerfil(2));
+        obterAsync.mockResolvedValue(criarPerfil(2));
 
         const resposta = await criarServico().ResolverPerfilEfetivoAsync(REQUISICAO, ct);
 
@@ -61,7 +61,7 @@ describe('ServicoResolucaoFormatacaoTest', () => {
 
     it('ResolverPerfilEfetivo_SemCorrespondenciaEConfiguracoesSemPerfil_RetornaUndefined', async () => {
         obterPerfilCorrespondente.mockResolvedValue(undefined);
-        obterPerfilAsync.mockResolvedValue(undefined);
+        obterAsync.mockResolvedValue(undefined);
 
         const resposta = await criarServico().ResolverPerfilEfetivoAsync(REQUISICAO, ct);
 
@@ -73,6 +73,6 @@ describe('ServicoResolucaoFormatacaoTest', () => {
 
         await criarServico().ResolverPerfilEfetivoAsync(REQUISICAO, ct);
 
-        expect(obterPerfilAsync).not.toHaveBeenCalled();
+        expect(obterAsync).not.toHaveBeenCalled();
     });
 });

@@ -1,5 +1,5 @@
 import type { CancellationToken } from 'vscode';
-import type { IRepositorioSchema } from '../../nucleo/Interfaces/Repositorios/IRepositorioSchema';
+import type { IRepositorioRegistroSchema } from '../../nucleo/Interfaces/Repositorios/IRepositorioRegistroSchema';
 import type { SalvarSchemaRequisicao } from '../DTOs/Entrada/Schema/SalvarSchemaRequisicao';
 import { UriSchema } from '../../nucleo/ObjetosDeValor/UriSchema';
 import { PadraoArquivo } from '../../nucleo/ObjetosDeValor/PadraoArquivo';
@@ -14,9 +14,9 @@ import { AssociacaoSchema } from '../../nucleo/Entidades/AssociacaoSchema';
  * a partir do DTO garante que as invariantes sejam verificadas antes de qualquer I/O.
  */
 export class ServicoRegistroSchema {
-    private readonly _repositorioSchema: IRepositorioSchema;
+    private readonly _repositorioSchema: IRepositorioRegistroSchema;
 
-    constructor(repositorioSchema: IRepositorioSchema) {
+    constructor(repositorioSchema: IRepositorioRegistroSchema) {
         this._repositorioSchema = repositorioSchema;
     }
 

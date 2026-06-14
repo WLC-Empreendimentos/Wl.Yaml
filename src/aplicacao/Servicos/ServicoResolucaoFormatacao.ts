@@ -1,5 +1,5 @@
 import type { CancellationToken } from 'vscode';
-import type { IRepositorioConfiguracoes } from '../../nucleo/Interfaces/Repositorios/IRepositorioConfiguracoes';
+import type { IRepositorioPerfilPadrao } from '../../nucleo/Interfaces/Repositorios/IRepositorioPerfilPadrao';
 import type { ResolverPerfilRequisicao } from '../DTOs/Entrada/Formatacao/ResolverPerfilRequisicao';
 import type { PerfilFormatacaoResposta } from '../DTOs/Saida/Formatacao/PerfilFormatacaoResposta';
 import type { ServicoCorrespondenciaPerfilProjeto } from './ServicoCorrespondenciaPerfilProjeto';
@@ -16,14 +16,14 @@ import { PerfilFormatacaoMapeador } from '../Mapeadores/PerfilFormatacaoMapeador
  */
 export class ServicoResolucaoFormatacao {
     private readonly _correspondencia: ServicoCorrespondenciaPerfilProjeto;
-    private readonly _repositorioConfiguracoes: IRepositorioConfiguracoes;
+    private readonly _repositorioPerfilPadrao: IRepositorioPerfilPadrao;
 
     constructor(
         correspondencia: ServicoCorrespondenciaPerfilProjeto,
-        repositorioConfiguracoes: IRepositorioConfiguracoes,
+        repositorioPerfilPadrao: IRepositorioPerfilPadrao,
     ) {
         this._correspondencia = correspondencia;
-        this._repositorioConfiguracoes = repositorioConfiguracoes;
+        this._repositorioPerfilPadrao = repositorioPerfilPadrao;
     }
 
     /**
@@ -41,7 +41,7 @@ export class ServicoResolucaoFormatacao {
         const perfilProjeto = await this._correspondencia.ObterPerfilCorrespondenteAsync(
             req.uriWorkspace, req.uriDocumento, ct,
         );
-        const perfilEfetivo = perfilProjeto ?? await this._repositorioConfiguracoes.ObterPerfilAsync(ct);
+        const perfilEfetivo = perfilProjeto ?? await this._repositorioPerfilPadrao.ObterAsync(ct);
         return perfilEfetivo ? PerfilFormatacaoMapeador.ParaResposta(perfilEfetivo) : undefined;
     }
 }

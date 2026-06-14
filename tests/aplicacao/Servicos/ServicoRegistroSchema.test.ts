@@ -1,5 +1,6 @@
 import type { CancellationToken } from 'vscode';
-import type { IRepositorioSchema } from '../../../src/nucleo/Interfaces/Repositorios/IRepositorioSchema';
+import type { IRepositorioRegistroSchema } from
+    '../../../src/nucleo/Interfaces/Repositorios/IRepositorioRegistroSchema';
 import { ServicoRegistroSchema } from '../../../src/aplicacao/Servicos/ServicoRegistroSchema';
 import { AssociacaoSchema } from '../../../src/nucleo/Entidades/AssociacaoSchema';
 import { UriSchemaInvalidaExcecao } from '../../../src/nucleo/Excecoes/Schema/UriSchemaInvalidaExcecao';
@@ -10,16 +11,15 @@ const ct = {} as CancellationToken;
 const URI_SCHEMA = 'https://exemplo.com/schema.json';
 const PADRAO = '**/*.yaml';
 
-function criarServico(repositorioSchema: jest.Mocked<IRepositorioSchema>): ServicoRegistroSchema {
+function criarServico(repositorioSchema: jest.Mocked<IRepositorioRegistroSchema>): ServicoRegistroSchema {
     return new ServicoRegistroSchema(repositorioSchema);
 }
 
 describe('ServicoRegistroSchemaTest', () => {
-    let repositorioSchema: jest.Mocked<IRepositorioSchema>;
+    let repositorioSchema: jest.Mocked<IRepositorioRegistroSchema>;
 
     beforeEach(() => {
         repositorioSchema = {
-            ObterPorDocumentoAsync: jest.fn(),
             SalvarAsync: jest.fn(),
         };
     });
