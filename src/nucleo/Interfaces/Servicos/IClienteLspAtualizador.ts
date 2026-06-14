@@ -2,21 +2,14 @@ import type { CancellationToken } from 'vscode';
 import type { AssociacaoSchema } from '../../Entidades/AssociacaoSchema';
 
 /**
- * Contrato para comunicação com o servidor yaml-language-server via LSP.
+ * Contrato para enviar associações schema ↔ arquivo ao yaml-language-server.
  *
  * @remarks
- * Isola o código de aplicação do protocolo concreto de transporte (IPC no
- * desktop, Web Worker no browser). A camada de apresentação inicializa o
- * cliente; os serviços apenas enviam dados via este contrato.
+ * Isola o protocolo concreto de transporte (IPC no desktop, Web Worker no
+ * browser). Serviços que apenas enviam atualizações não precisam conhecer
+ * o estado de prontidão do cliente.
  */
-export interface IClienteLsp {
-    /**
-     * Indica se o servidor LSP está ativo e pronto para receber mensagens.
-     *
-     * @returns `true` quando o cliente está no estado `Running`.
-     */
-    EstaAtivo(): boolean;
-
+export interface IClienteLspAtualizador {
     /**
      * Envia ao servidor LSP as associações schema ↔ arquivo vigentes.
      *
