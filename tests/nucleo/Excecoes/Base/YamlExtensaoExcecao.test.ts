@@ -1,10 +1,6 @@
 import { YamlExtensaoExcecao } from '../../../../src/nucleo/Excecoes/Base/YamlExtensaoExcecao';
 
-class ExcecaoConcrataParaTeste extends YamlExtensaoExcecao {
-    constructor(mensagem: string) {
-        super(mensagem);
-    }
-}
+class ExcecaoConcrataParaTeste extends YamlExtensaoExcecao {}
 
 describe('YamlExtensaoExcecaoTest', () => {
     test('Construtor_MensagemValida_DefineMessageCorretamente', () => {

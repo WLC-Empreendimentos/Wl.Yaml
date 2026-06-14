@@ -3,14 +3,14 @@ import { PadraoArquivoInvalidoExcecao } from '../../../src/nucleo/Excecoes/Perfi
 
 describe('PadraoArquivoValidadorTest', () => {
     test('Validar_ValorValido_NaoLancaExcecao', () => {
-        expect(() => PadraoArquivoValidador.Validar('**/*.yaml')).not.toThrow();
+        expect(() => { PadraoArquivoValidador.Validar('**/*.yaml'); }).not.toThrow();
     });
 
     test('Validar_StringVazia_LancaPadraoArquivoInvalidoExcecao', () => {
-        expect(() => PadraoArquivoValidador.Validar('')).toThrow(PadraoArquivoInvalidoExcecao);
+        expect(() => { PadraoArquivoValidador.Validar(''); }).toThrow(PadraoArquivoInvalidoExcecao);
     });
 
     test('Validar_StringSomenteEspacos_LancaPadraoArquivoInvalidoExcecao', () => {
-        expect(() => PadraoArquivoValidador.Validar('   ')).toThrow(PadraoArquivoInvalidoExcecao);
+        expect(() => { PadraoArquivoValidador.Validar('   '); }).toThrow(PadraoArquivoInvalidoExcecao);
     });
 });

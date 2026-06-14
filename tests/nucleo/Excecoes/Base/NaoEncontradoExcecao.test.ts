@@ -1,11 +1,7 @@
 import { NaoEncontradoExcecao } from '../../../../src/nucleo/Excecoes/Base/NaoEncontradoExcecao';
 import { YamlExtensaoExcecao } from '../../../../src/nucleo/Excecoes/Base/YamlExtensaoExcecao';
 
-class NaoEncontradoConcrataParaTeste extends NaoEncontradoExcecao {
-    constructor(mensagem: string) {
-        super(mensagem);
-    }
-}
+class NaoEncontradoConcrataParaTeste extends NaoEncontradoExcecao {}
 
 describe('NaoEncontradoExcecaoTest', () => {
     test('Construtor_MensagemValida_DefineMessageCorretamente', () => {
