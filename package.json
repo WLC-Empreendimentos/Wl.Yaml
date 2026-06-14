@@ -75,11 +75,13 @@
         "empacotar": "vsce package --no-dependencies"
     },
     "dependencies": {
+        "minimatch": "^10.2.5",
         "vscode-languageclient": "^9.0.1",
         "yaml-language-server": "1.15.0"
     },
     "devDependencies": {
         "@types/jest": "^29.5.14",
+        "@types/minimatch": "^5.1.2",
         "@types/node": "^22.19.21",
         "@types/vscode": "^1.95.0",
         "@vscode/test-cli": "^0.0.10",

@@ -17,9 +17,10 @@ module.exports = {
         }],
     },
 
-    // vscode não existe fora do host de extensão — substituído por stub
+    // vscode e vscode-languageclient não existem fora do host de extensão — substituídos por stubs
     moduleNameMapper: {
         '^vscode$': '<rootDir>/tests/__mocks__/vscode.ts',
+        '^vscode-languageclient(/.*)?$': '<rootDir>/tests/__mocks__/vscode-languageclient.ts',
     },
 
     // Cobertura
