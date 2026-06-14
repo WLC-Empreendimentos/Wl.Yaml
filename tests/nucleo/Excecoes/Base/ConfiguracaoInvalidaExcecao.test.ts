@@ -1,11 +1,7 @@
 import { ConfiguracaoInvalidaExcecao } from '../../../../src/nucleo/Excecoes/Base/ConfiguracaoInvalidaExcecao';
 import { YamlExtensaoExcecao } from '../../../../src/nucleo/Excecoes/Base/YamlExtensaoExcecao';
 
-class ConfiguracaoInvalidaConcrataParaTeste extends ConfiguracaoInvalidaExcecao {
-    constructor(mensagem: string) {
-        super(mensagem);
-    }
-}
+class ConfiguracaoInvalidaConcrataParaTeste extends ConfiguracaoInvalidaExcecao {}
 
 describe('ConfiguracaoInvalidaExcecaoTest', () => {
     test('Construtor_MensagemValida_DefineMessageCorretamente', () => {
