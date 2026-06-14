@@ -1,5 +1,5 @@
 import type { CancellationToken } from 'vscode';
-import type { IRepositorioSchema } from '../../nucleo/Interfaces/Repositorios/IRepositorioSchema';
+import type { IRepositorioConsultaSchema } from '../../nucleo/Interfaces/Repositorios/IRepositorioConsultaSchema';
 import type { ObterSchemaRequisicao } from '../DTOs/Entrada/Schema/ObterSchemaRequisicao';
 import type { AssociacaoSchemaResposta } from '../DTOs/Saida/Schema/AssociacaoSchemaResposta';
 import { DocumentoYaml } from '../../nucleo/Entidades/DocumentoYaml';
@@ -14,9 +14,9 @@ import { AssociacaoSchemaMapeador } from '../Mapeadores/AssociacaoSchemaMapeador
  * de linguagem.
  */
 export class ServicoConsultaSchema {
-    private readonly _repositorioSchema: IRepositorioSchema;
+    private readonly _repositorioSchema: IRepositorioConsultaSchema;
 
-    constructor(repositorioSchema: IRepositorioSchema) {
+    constructor(repositorioSchema: IRepositorioConsultaSchema) {
         this._repositorioSchema = repositorioSchema;
     }
 

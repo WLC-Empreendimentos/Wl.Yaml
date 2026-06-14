@@ -1,5 +1,6 @@
 import type { CancellationToken } from 'vscode';
-import type { IRepositorioSchema } from '../../../src/nucleo/Interfaces/Repositorios/IRepositorioSchema';
+import type { IRepositorioConsultaSchema } from
+    '../../../src/nucleo/Interfaces/Repositorios/IRepositorioConsultaSchema';
 import { ServicoConsultaSchema } from '../../../src/aplicacao/Servicos/ServicoConsultaSchema';
 import { AssociacaoSchema } from '../../../src/nucleo/Entidades/AssociacaoSchema';
 import { UriSchema } from '../../../src/nucleo/ObjetosDeValor/UriSchema';
@@ -16,17 +17,16 @@ function criarAssociacao(): AssociacaoSchema {
     return new AssociacaoSchema(new UriSchema(URI_SCHEMA), new PadraoArquivo(PADRAO));
 }
 
-function criarServico(repositorioSchema: jest.Mocked<IRepositorioSchema>): ServicoConsultaSchema {
+function criarServico(repositorioSchema: jest.Mocked<IRepositorioConsultaSchema>): ServicoConsultaSchema {
     return new ServicoConsultaSchema(repositorioSchema);
 }
 
 describe('ServicoConsultaSchemaTest', () => {
-    let repositorioSchema: jest.Mocked<IRepositorioSchema>;
+    let repositorioSchema: jest.Mocked<IRepositorioConsultaSchema>;
 
     beforeEach(() => {
         repositorioSchema = {
             ObterPorDocumentoAsync: jest.fn(),
-            SalvarAsync: jest.fn(),
         };
     });
 
